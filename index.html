@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scout Hiking/Camping Planner</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --s0:#f5f3f8;--s1:#faf9fc;--s2:#fff;
+      --tp:#1a1020;--ts:#5c4f6a;--tm:#9284a0;
+      --b:rgba(107,45,139,.10);--bs:rgba(107,45,139,.20);
+      --bd:#a32d2d;--bw:#854f0b;--bgs2:#3b6d11;
+      --bgd:#fcebeb;--bgs:#eaf3de;--bgw:#faeeda;
+      --td:#a32d2d;--tsu:#3b6d11;--tw:#854f0b;
+      /* Scouts Australia brand */
+      --purple:#6B2D8B;--purple-h:#55226F;--purple-lt:#8B4CAB;
+      --gold:#F4D400;--gold-d:#B8A000;--gold-bg:#FFFCE5;--gold-b:#D4B800;
+      --ba:var(--purple);--bga:#F3E8FA;--ta:var(--purple);
+      --fa:var(--purple);--fah:var(--purple-h);--oa:#fff;--r:8px;
+      --f:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif
+    }
+    @media(prefers-color-scheme:dark){:root{
+      --s0:#13091a;--s1:#1e1028;--s2:#271538;
+      --tp:#f0eaf5;--ts:#c4b0d5;--tm:#8a7499;
+      --b:rgba(192,132,224,.12);--bs:rgba(192,132,224,.22);
+      --bd:#f09595;--bw:#ef9f27;--bgs2:#97c459;
+      --bgd:#501313;--bgs:#173404;--bgw:#412402;
+      --td:#f09595;--tsu:#c0dd97;--tw:#fac775;
+      --purple:#C084E0;--purple-h:#A855C7;--purple-lt:#D4A0EE;
+      --gold:#F4D400;--gold-d:#F9E040;--gold-bg:#2A2600;--gold-b:#C9AE00;
+      --ba:var(--purple);--bga:#2D1040;--ta:var(--purple);
+      --fa:var(--purple);--fah:var(--purple-h);--oa:#fff
+    }}
+    body{font-family:var(--f);background:var(--s0);color:var(--tp);min-height:100vh;padding:1.5rem 1rem 4rem}
+    .app{max-width:720px;margin:0 auto}
+    .hdr{background:linear-gradient(135deg,#6B2D8B 0%,#4A1E61 100%);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden}
+    .hdr::after{content:'⚜';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:64px;opacity:.10;pointer-events:none;line-height:1}
+    .logo{width:52px;height:52px;border-radius:50%;background:rgba(244,212,0,.18);border:2px solid rgba(244,212,0,.45);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:26px;line-height:1}
+    .hdr h1{font-size:19px;font-weight:700;margin-bottom:3px;color:#fff;letter-spacing:-.01em}
+    .hdr p{font-size:12px;color:rgba(255,255,255,.70);letter-spacing:.02em}
+    .hdr-badge{display:inline-flex;align-items:center;gap:5px;background:var(--gold);color:#3a2600;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:5px;letter-spacing:.03em}
+    .tabs{display:flex;gap:4px;margin-bottom:1rem;background:var(--s1);border:.5px solid var(--b);border-radius:var(--r);padding:4px}
+    .tab{flex:1;padding:9px 4px;border:none;border-radius:6px;background:transparent;color:var(--ts);font-family:var(--f);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .15s}
+    .tab.on{background:var(--purple);color:#fff;font-weight:600;border:none}
+    .tab:hover:not(.on){background:var(--bga);color:var(--purple)}
+    .tab i{font-size:15px}
+    .pnl{display:none}.pnl.on{display:block}
+    .card{background:var(--s2);border:.5px solid var(--b);border-radius:12px;padding:1.25rem;margin-bottom:.75rem}
+    .sl{font-size:11px;font-weight:500;color:var(--tm);text-transform:uppercase;letter-spacing:.06em;margin:1rem 0 .5rem}
+    .sl:first-child{margin-top:0}
+    .fr{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+    input,select,textarea{font-family:var(--f);font-size:14px;padding:8px 10px;border:.5px solid var(--bs);border-radius:var(--r);background:var(--s1);color:var(--tp);outline:none;width:100%}
+    input:focus,select:focus,textarea:focus{border-color:var(--purple);box-shadow:0 0 0 2px var(--bga)}
+    .sz-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+    .sz-card{background:var(--s1);border-radius:var(--r);padding:10px 12px}
+    .sz-card b{font-size:13px;font-weight:500;display:block;margin-bottom:2px}
+    .sz-card p{font-size:12px;color:var(--tm);line-height:1.5}
+    .sr-wrap{border-bottom:.5px solid var(--b);padding-bottom:6px;margin-bottom:6px}
+    .sr-wrap:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+    .sr-row{display:grid;grid-template-columns:1fr 90px auto auto;gap:8px;align-items:center;padding:6px 0}
+    .sr-row input{font-size:14px;padding:6px 10px}
+    .sz-sel{font-size:13px;padding:6px 8px}
+    .al-tog{width:30px;height:30px;border:.5px solid var(--bs);border-radius:var(--r);background:transparent;color:var(--ts);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .15s}
+    .al-tog:hover{background:var(--bga);color:var(--ta);border-color:var(--ba)}
+    .al-tog.on{background:var(--bgd);color:var(--td);border-color:var(--bd)}
+    .rm-btn{width:30px;height:30px;border:none;border-radius:var(--r);background:transparent;color:var(--tm);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px}
+    .rm-btn:hover{background:var(--bgd);color:var(--td)}
+    .al-panel{display:none;padding:8px 0 4px 0;flex-wrap:wrap;gap:6px}
+    .al-panel.on{display:flex}
+    .chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border:.5px solid var(--bs);border-radius:var(--r);font-size:12px;cursor:pointer;background:var(--s1);color:var(--ts);font-family:var(--f);transition:all .15s}
+    .chip i{font-size:13px}
+    .chip.on{background:var(--bgd);border-color:var(--bd);color:var(--td)}
+    .add-btn{width:100%;padding:9px;border:.5px dashed var(--bs);border-radius:var(--r);background:transparent;color:var(--tm);font-family:var(--f);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px}
+    .add-btn:hover{background:var(--s1);color:var(--ts)}
+    .pg{display:flex;gap:8px;margin-bottom:12px}
+    .pb{flex:1;padding:8px 6px;border:.5px solid var(--bs);border-radius:var(--r);background:var(--s1);color:var(--ts);font-family:var(--f);font-size:13px;cursor:pointer;text-align:center;line-height:1.4;transition:all .15s}
+    .pb.on{background:var(--bga);border-color:var(--purple);color:var(--purple);font-weight:600}
+    .gen{width:100%;padding:13px;background:var(--fa);color:var(--oa);border:none;border-radius:var(--r);font-family:var(--f);font-size:15px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:.5rem;transition:background .15s}
+    .gen:hover{background:var(--fah)}.gen:active{transform:scale(.98)}
+    .dc{background:var(--s2);border:.5px solid var(--b);border-radius:12px;margin-bottom:.75rem;overflow:hidden}
+    .dh{padding:.75rem 1rem;background:var(--s1);border-bottom:.5px solid var(--b);display:flex;justify-content:space-between;align-items:center}
+    .dt{font-weight:500;font-size:14px}
+    .kb{font-size:12px;padding:3px 10px;border-radius:var(--r);background:var(--gold);color:#3a2600;font-weight:600}
+    .dn{padding:.75rem 1rem;font-size:13px;border-bottom:.5px solid var(--b);display:flex;gap:8px;align-items:flex-start}
+    .dn i{flex-shrink:0;margin-top:1px}
+    .dn.arr{background:var(--bga)}.dn.arr i{color:var(--ta)}
+    .dn.dep{background:var(--bgw)}.dn.dep i{color:var(--tw)}
+    .mr{padding:.65rem 1rem;border-bottom:.5px solid var(--b);display:grid;grid-template-columns:88px minmax(0,1fr) auto 30px;gap:8px;align-items:start}
+    .mr:last-child{border-bottom:none}
+    .mt{font-size:12px;font-weight:500;color:var(--tm);padding-top:2px}
+    .mn{font-size:14px}
+    .ma{font-size:12px;color:var(--ts);margin-top:2px}
+    .mk{font-size:13px;color:var(--tm);white-space:nowrap;padding-top:2px}
+    .swap-btn{width:26px;height:26px;border:.5px solid var(--b);border-radius:var(--r);background:transparent;color:var(--tm);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+    .swap-btn:hover{background:var(--bga);color:var(--purple);border-color:var(--purple)}
+    .mb{display:flex;border-top:.5px solid var(--b)}
+    .mc{flex:1;text-align:center;padding:.6rem 0;border-right:.5px solid var(--b)}
+    .mc:last-child{border-right:none}
+    .mv{font-size:15px;font-weight:500}
+    .mlb{font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
+    .mc.pr .mv{color:var(--ta)}.mc.cb .mv{color:var(--tsu)}.mc.ft .mv{color:var(--tw)}
+    .ib{border-radius:var(--r);padding:.75rem 1rem;display:flex;gap:10px;align-items:flex-start;font-size:13px;margin-bottom:.75rem;border:.5px solid}
+    .ib i{flex-shrink:0;margin-top:1px}
+    .ib.w{background:var(--bgw);border-color:var(--bw)}.ib.w i{color:var(--tw)}
+    .ib.d{background:var(--bgd);border-color:var(--bd)}.ib.d i{color:var(--td)}
+    .ib.s{background:var(--bgs);border-color:var(--bgs2)}.ib.s i{color:var(--tsu)}
+    .ib.a{background:var(--bga);border-color:var(--ba)}.ib.a i{color:var(--ta)}
+    .str{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:.75rem}
+    .st{background:var(--s1);border-radius:var(--r);padding:.75rem;text-align:center}
+    .sv{font-size:20px;font-weight:500}.sl2{font-size:11px;color:var(--tm);margin-top:2px}
+    .hr{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:.65rem 0;border-bottom:.5px solid var(--b);font-size:14px}
+    .hr:last-child{border-bottom:none}
+    .hn{font-weight:500;font-size:14px}.hsub{font-size:12px;color:var(--tm);margin-top:2px}
+    .pd{text-align:right}.pw{font-size:14px;font-weight:500}.pl{font-size:12px;color:var(--tm)}
+    .gt{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 7px;border-radius:var(--r);background:var(--bga);color:var(--ta);border:.5px solid var(--ba);margin-right:4px}
+    .at{display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:2px 7px;border-radius:var(--r);background:var(--bgd);color:var(--td);border:.5px solid var(--bd);margin-right:4px}
+    .cat-title{font-size:11px;font-weight:500;color:var(--tm);text-transform:uppercase;letter-spacing:.06em;padding:.5rem 0;border-bottom:.5px solid var(--b);margin-bottom:4px}
+    .shr{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:.5rem 0;border-bottom:.5px solid var(--b);font-size:14px}
+    .shr:last-child{border-bottom:none}
+    .si{font-size:13px}.sisub{font-size:11px;color:var(--tm)}
+    .sq{font-size:13px;color:var(--ts);text-align:right;white-space:nowrap}
+    .sp{font-size:13px;font-weight:500;text-align:right;min-width:56px}
+    .tot-card{background:var(--s1);border-radius:12px;border:.5px solid var(--b);padding:1rem 1.25rem;margin-top:.75rem}
+    .tot-row{display:flex;justify-content:space-between;align-items:center;font-weight:500;font-size:16px;margin-bottom:4px}
+    .cpp{font-size:13px;color:var(--tm)}
+    .prt-btn{width:100%;padding:11px;margin-top:.75rem;border:.5px solid var(--bs);border-radius:var(--r);background:transparent;color:var(--tp);font-family:var(--f);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+    .prt-btn:hover{background:var(--s1)}
+    .es{text-align:center;padding:3rem 1rem;color:var(--tm)}
+    .es i{font-size:48px;display:block;margin-bottom:12px;opacity:.3}
+    .es p{font-size:14px}
+    @media print{
+      body{background:#fff;padding:0;color:#000}
+      .app{max-width:100%}
+      .hdr,.tabs,#pnl-plan,#pnl-meals,#pnl-logistics,.prt-btn,.ib.w{display:none!important}
+      #pnl-shop{display:block!important}
+      .card{border:1px solid #ccc;break-inside:avoid}
+      *{color:#000!important;background:#fff!important;border-color:#ccc!important;box-shadow:none!important}
+      .sp,.tot-row span:last-child{font-weight:700}
+      h2.ptitle{display:block!important;font-size:18px;font-weight:600;margin-bottom:12px}
+    }
+    h2.ptitle{display:none}
+    @media(max-width:520px){
+      .fr{grid-template-columns:1fr}
+      .mr{grid-template-columns:80px minmax(0,1fr) auto}
+      .mk,.swap-btn{display:none}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="hdr">
+    <div class="logo">🏕️</div>
+    <div>
+      <h1>Scout Hiking/Camping Planner</h1>
+      <p>Patrol meal planner, logistics and shopping</p>
+      <div class="hdr-badge">⚜️ Scouts NSW &nbsp;·&nbsp; Ages 11–14</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" onclick="go('plan')" id="tab-plan">📋 Plan</button>
+    <button class="tab" onclick="go('meals')" id="tab-meals">🍲 Meals</button>
+    <button class="tab" onclick="go('logistics')" id="tab-logistics">🎒 Logistics</button>
+    <button class="tab" onclick="go('shop')" id="tab-shop">🛒 Shopping</button>
+  </div>
+
+  <div class="pnl on" id="pnl-plan">
+    <div class="card">
+      <p class="sl">🗺️ Trip details</p>
+      <div class="fr">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label style="font-size:13px;color:var(--ts)" for="days">Duration (days)</label>
+          <input type="number" id="days" min="2" max="10" value="3" />
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label style="font-size:13px;color:var(--ts)" for="terrain">Terrain</label>
+          <select id="terrain">
+            <option>Flat trails</option>
+            <option selected>Mixed bush</option>
+            <option>Steep mountain</option>
+          </select>
+        </div>
+      </div>
+      <div class="ib a" style="margin-bottom:0">
+        <i class="ti ti-info-circle"></i>
+        <div><strong>Day 1 (arrival):</strong> Patrol provides afternoon tea and dinner only. Scouts eat breakfast at home and bring their own morning tea and lunch.<br><strong>Last day (departure):</strong> Patrol provides breakfast and morning tea only. Scouts will be home for lunch and dinner — no patrol catering needed.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="sl">👥 Scout roster</p>
+      <div class="sz-grid">
+        <div class="sz-card">
+          <b>🎒 Lighter carry</b>
+          <p>Up to 7 kg pack<br>~35–42 kg body weight<br>~2,200 kcal/day hiking</p>
+        </div>
+        <div class="sz-card">
+          <b>🎒 Standard carry</b>
+          <p>Up to 9 kg pack<br>~43–52 kg body weight<br>~2,600 kcal/day hiking</p>
+        </div>
+        <div class="sz-card">
+          <b>🎒 Strong carry</b>
+          <p>Up to 11 kg pack<br>~53–65 kg body weight<br>~3,000 kcal/day hiking</p>
+        </div>
+      </div>
+      <div id="roster"></div>
+      <button class="add-btn" onclick="addScout()"><i class="ti ti-plus" aria-hidden="true"></i> Add scout</button>
+    </div>
+
+    <div class="card">
+      <p class="sl">🍽️ Food preferences</p>
+      <label style="font-size:13px;color:var(--ts);display:block;margin-bottom:6px">🌅 1. Breakfast style</label>
+      <div class="pg" id="pg-bf">
+        <button class="pb on" onclick="setP('bf','sweet',this)">Sweet<br><span style="font-size:11px;opacity:.7">oats, muesli, pancakes</span></button>
+        <button class="pb" onclick="setP('bf','sav',this)">Savoury<br><span style="font-size:11px;opacity:.7">couscous, miso rice</span></button>
+      </div>
+      <label style="font-size:13px;color:var(--ts);display:block;margin-bottom:6px;margin-top:.5rem">🍲 2. Dinner base</label>
+      <div class="pg" id="pg-din">
+        <button class="pb" onclick="setP('din','pasta',this)">Pasta-heavy</button>
+        <button class="pb on" onclick="setP('din','mixed',this)">Varied</button>
+        <button class="pb" onclick="setP('din','rice',this)">Rice-heavy</button>
+      </div>
+      <label style="font-size:13px;color:var(--ts);display:block;margin-bottom:6px;margin-top:.5rem">🌶️ 3. Spice level</label>
+      <div class="pg" id="pg-sp">
+        <button class="pb on" onclick="setP('sp','mild',this)">Mild<br><span style="font-size:11px;opacity:.7">no chilli</span></button>
+        <button class="pb" onclick="setP('sp','med',this)">Medium<br><span style="font-size:11px;opacity:.7">some warmth</span></button>
+        <button class="pb" onclick="setP('sp','bold',this)">Bold<br><span style="font-size:11px;opacity:.7">chilli and spice</span></button>
+      </div>
+    </div>
+
+    <button class="gen" onclick="generate()">🏔️ Generate hike plan</button>
+  </div>
+
+  <div class="pnl" id="pnl-meals">
+    <div id="meals-out"><div class="es"><i class="ti ti-salad"></i><p>Fill in the Plan tab and tap "Generate hike plan".</p></div></div>
+  </div>
+  <div class="pnl" id="pnl-logistics">
+    <div id="log-out"><div class="es"><i class="ti ti-backpack"></i><p>Generate a plan first to see load distribution.</p></div></div>
+  </div>
+  <div class="pnl" id="pnl-shop">
+    <div id="shop-out"><div class="es"><i class="ti ti-shopping-cart"></i><p>Generate a plan first to see the shopping list.</p></div></div>
+  </div>
+</div>
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+let uid = 0;
+let scouts = [];
+const pref = { bf:'sweet', din:'mixed', sp:'mild' };
+const slots = {};
+let activePlan = null;
+let depLunch = false;
+
+const SZ = {
+  S:{ label:'Lighter carry', maxKg:7, kcal:2200 },
+  M:{ label:'Standard carry', maxKg:9, kcal:2600 },
+  L:{ label:'Strong carry', maxKg:11, kcal:3000 },
+};
+
+const ALLERGY_OPTS = [
+  ['nuts','Tree nuts'],['peanuts','Peanuts'],['gluten','Gluten-free'],
+  ['dairy','Dairy-free'],['egg','Egg-free'],['soy','Soy-free'],
+  ['veg','Vegetarian'],['vegan','Vegan'],['halal','Halal'],
+];
+
+// ─── 30-meal bank (10 BF + 10 LU + 10 DIN) — all shelf-stable, Coles products ──
+const BANK = {
+  bf:[
+    { style:'sweet', name:'Instant oats with honey, dried mango and coconut flakes', kcal:540,
+      gfSwap:'Use certified GF oats or rice porridge instead', vegOk:true, veganSwap:'Swap honey for maple syrup' },
+    { style:'sweet', name:'Muesli with coconut milk (tetra pak) and banana chips', kcal:555,
+      gfSwap:'Use GF muesli or quinoa flakes', vegOk:true, veganOk:true },
+    { style:'sweet', name:'Instant pancakes with golden syrup and tinned peaches', kcal:580,
+      gfSwap:'Use GF pancake mix', vegOk:true, eggSwap:'Use chia egg (1 tbsp chia + 3 tbsp water)' },
+    { style:'sweet', name:'Quinoa flakes with honey, coconut milk (tetra pak) and dried blueberries', kcal:520,
+      vegOk:true, veganSwap:'Swap honey for maple syrup', gfOk:true },
+    { style:'sweet', name:'Coles honey oat sachets with coconut flakes and dried apricots', kcal:530,
+      gfSwap:'Use GF oat sachets', vegOk:true, veganSwap:'Swap honey for maple syrup' },
+    { style:'sweet', name:'Breakfast couscous with honey, cinnamon and mixed dried fruit', kcal:515,
+      gfSwap:'Swap couscous for quinoa flakes', vegOk:true, veganSwap:'Swap honey for maple syrup' },
+    { style:'sav', name:'Savoury couscous with olive oil, mixed herbs and sunflower seeds', kcal:490,
+      gfSwap:'Swap couscous for instant rice', vegOk:true, veganOk:true },
+    { style:'sav', name:'Instant miso soup with rice, sesame oil and nori flakes', kcal:470,
+      gfOk:true, vegOk:true, soySwap:'Use vegetable stock sachet instead of miso' },
+    { style:'sav', name:'Savoury instant oats with vegetable stock powder, olive oil and pumpkin seeds', kcal:505,
+      gfSwap:'Use GF oats or rice porridge', vegOk:true, veganOk:true },
+    { style:'sav', name:'Instant noodle broth with sesame oil, soy sauce and dried spring onion', kcal:480,
+      gfSwap:'Use rice noodle broth', vegOk:true, soySwap:'Use coconut aminos instead of soy' },
+  ],
+  lu:[
+    { name:'Wraps with tuna sachet, dried sweetcorn and hot sauce sachet', kcal:680,
+      vegName:'Wraps with dried chickpeas, dried sweetcorn and hot sauce', gfSwap:'Use corn tortillas or rice crackers' },
+    { name:'Pita bread with tahini, dried chickpeas and sun-dried tomatoes', kcal:640,
+      vegOk:true, veganOk:true, gfSwap:'Use GF rice crackers' },
+    { name:'Rice crackers with salmon sachet, capers and lemon pepper', kcal:620,
+      gfOk:true, vegName:'Rice crackers with hummus sachets and sun-dried tomatoes' },
+    { name:'Instant noodle cup with sesame oil and soy sauce', kcal:660,
+      vegOk:true, gfSwap:'Use rice noodle cup', soySwap:'Use coconut aminos instead' },
+    { name:'Couscous with tuna sachet, dried sweetcorn and olive oil', kcal:650,
+      vegName:'Couscous with dried chickpeas, dried sweetcorn and olive oil', gfSwap:'Use instant rice instead of couscous' },
+    { name:'Rice cakes with tahini, honey and pumpkin seeds', kcal:600,
+      gfOk:true, vegOk:true, veganSwap:'Swap honey for maple syrup' },
+    { name:'Wraps with salmon sachet, dried sweetcorn and sweet chilli sachet', kcal:670,
+      vegName:'Wraps with dried chickpeas, dried sweetcorn and sweet chilli sachet', gfSwap:'Use corn tortillas' },
+    { name:'Rice crackers with tahini, sun-dried tomatoes and mixed seeds', kcal:610,
+      gfOk:true, vegOk:true, veganOk:true },
+    { name:'Instant noodle soup with salmon sachet and sesame oil', kcal:655,
+      vegName:'Instant noodle soup with dried chickpeas and sesame oil', soySwap:'Use coconut aminos' },
+    { name:'Flatbread with tahini, dried chickpeas and dried mixed herbs', kcal:630,
+      vegOk:true, veganOk:true, gfSwap:'Use GF rice crackers' },
+  ],
+  din:[
+    { name:'Red lentil dhal with basmati rice', kcal:800,
+      gfOk:true, vegOk:true, veganOk:true, spiceNote:true },
+    { name:'Tuna and corn pasta with olive oil and capers', kcal:820,
+      vegName:'Chickpea and corn pasta with olive oil and capers', gfSwap:'Use GF pasta or basmati rice' },
+    { name:'Salmon sachet and tomato pasta with dried mixed herbs', kcal:840,
+      vegName:'Chickpea and tomato pasta with dried mixed herbs', gfSwap:'Use GF pasta or basmati rice' },
+    { name:'Chickpea and veg curry with basmati rice', kcal:810,
+      gfOk:true, vegOk:true, veganOk:true, spiceNote:true },
+    { name:'Soy sesame fried rice with dried sweetcorn and dried veg', kcal:790,
+      gfOk:true, vegOk:true, veganOk:true, soySwap:'Use coconut aminos instead of soy sauce' },
+    { name:'Pasta with dried cannellini beans, passata carton and mixed herbs', kcal:800,
+      vegOk:true, veganOk:true, gfSwap:'Use GF pasta or basmati rice' },
+    { name:'Salmon sachet and noodle stir-fry with soy sauce and sesame', kcal:830,
+      vegName:'Chickpea and noodle stir-fry with soy sauce and sesame', soySwap:'Use coconut aminos' },
+    { name:'Red lentil and tomato couscous with mixed spice', kcal:780,
+      vegOk:true, veganOk:true, gfSwap:'Use instant rice or quinoa instead of couscous', spiceNote:true },
+    { name:'Tuna sachet and rice noodle soup with soy, ginger and sesame', kcal:800,
+      gfOk:true, vegName:'Tinned chickpea and rice noodle soup with soy, ginger and sesame', soySwap:'Use coconut aminos' },
+    { name:'Split pea soup with instant rice and vegetable stock', kcal:760,
+      gfOk:true, vegOk:true, veganOk:true },
+  ],
+  sn:[
+    { name:'Coles Fruit and Nut Trail Mix and muesli bar', kcal:420, nuts:true },
+    { name:'Coles mixed nuts and dark chocolate squares', kcal:410, nuts:true },
+    { name:'Fruit leather, rice crackers and tahini sachet', kcal:400, nuts:false },
+    { name:'Coles muesli bar and dried apricots', kcal:380, nuts:false },
+    { name:'GORP mix — oats, raisins, choc chips and pumpkin seeds', kcal:430, nuts:false },
+    { name:'Coles nut bar and mixed dried berries', kcal:415, nuts:true },
+    { name:'Coles Seed Mix and dark chocolate squares', kcal:395, nuts:false },
+    { name:'Rice cakes with tahini and honey and dried mango', kcal:390, nuts:false },
+  ],
+};
+
+// ─── Roster ──────────────────────────────────────────────────────────────────
+function addScout(name='', size='M'){
+  scouts.push({ id:++uid, name, size, al:new Set(), open:false });
+  renderRoster();
+}
+function removeScout(id){ scouts=scouts.filter(s=>s.id!==id); renderRoster(); }
+function toggleAlPanel(id){
+  const s=scouts.find(x=>x.id===id);
+  if(s){ s.open=!s.open; renderRoster(); }
+}
+function togScoutAl(id, key){
+  const s=scouts.find(x=>x.id===id);
+  if(!s) return;
+  s.al.has(key)?s.al.delete(key):s.al.add(key);
+  renderRoster();
+}
+function updS(id,f,v){ const s=scouts.find(x=>x.id===id); if(s) s[f]=v; }
+
+function renderRoster(){
+  const el=document.getElementById('roster');
+  if(!scouts.length){ el.innerHTML='<p style="font-size:13px;color:var(--tm);padding:8px 0">No scouts added yet.</p>'; return; }
+  el.innerHTML=scouts.map(s=>{
+    const hasAl=s.al.size>0;
+    const chips=ALLERGY_OPTS.map(([k,label])=>`
+      <button class="chip${s.al.has(k)?' on':''}" onclick="togScoutAl(${s.id},'${k}')">
+        <i class="ti ti-circle-x"></i>${label}
+      </button>`).join('');
+    return `
+    <div class="sr-wrap">
+      <div class="sr-row">
+        <input type="text" placeholder="Scout name" value="${s.name}" oninput="updS(${s.id},'name',this.value)" />
+        <select class="sz-sel" onchange="updS(${s.id},'size',this.value)">
+          <option value="S"${s.size==='S'?' selected':''}>Lighter</option>
+          <option value="M"${s.size==='M'?' selected':''}>Standard</option>
+          <option value="L"${s.size==='L'?' selected':''}>Stronger</option>
+        </select>
+        <button class="al-tog${s.open?' on':''}" onclick="toggleAlPanel(${s.id})" title="Dietary needs" aria-label="Toggle dietary needs">
+          <i class="ti ti-${hasAl?'heart-off':'heart'}"></i>
+        </button>
+        <button class="rm-btn" onclick="removeScout(${s.id})" aria-label="Remove scout"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="al-panel${s.open?' on':''}">${chips}</div>
+    </div>`;
+  }).join('');
+}
+
+function setP(type,val,btn){ pref[type]=val; btn.closest('.pg').querySelectorAll('.pb').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); }
+function go(name){ document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on')); document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('on')); document.getElementById('tab-'+name).classList.add('on'); document.getElementById('pnl-'+name).classList.add('on'); }
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+function scoutsWith(key){ return scouts.filter(s=>s.al.has(key)||s.al.has('vegan'&&key==='veg')); }
+function anyWith(key){ return scouts.some(s=>s.al.has(key)); }
+function namesOf(scoutList){ return scoutList.map((s,i)=>s.name||`Scout ${i+1}`).join(', '); }
+
+function getMeal(type, dayIdx){
+  const key=`${dayIdx}_${type}`;
+  if(slots[key]===undefined) slots[key]=dayIdx;
+  const bank=BANK[type];
+  return { meal:bank[slots[key]%bank.length], idx:slots[key]%bank.length };
+}
+
+function getSnack(dayIdx, slotSuffix){
+  const key=`${dayIdx}_${slotSuffix}`;
+  const noNuts=anyWith('nuts')||anyWith('peanuts');
+  if(slots[key]===undefined) slots[key]=(dayIdx*2+(slotSuffix==='at'?1:0));
+  const pool=BANK.sn.filter(s=>noNuts?!s.nuts:true);
+  if(!pool.length) return { meal:BANK.sn[0], idx:0 };
+  return { meal:pool[slots[key]%pool.length], idx:slots[key] };
+}
+
+// ─── Per-scout meal notes ─────────────────────────────────────────────────────
+function mealNotes(meal, type){
+  const notes=[];
+  const veg=scoutsWith('veg').concat(scoutsWith('vegan').filter(s=>!scoutsWith('veg').includes(s)));
+  const vegScouts=[...new Set([...scoutsWith('veg'),...scoutsWith('vegan')])];
+  const gfScouts=scoutsWith('gluten');
+  const nutScouts=[...new Set([...scoutsWith('nuts'),...scoutsWith('peanuts')])];
+  const soyScouts=scoutsWith('soy');
+  const dairyScouts=scoutsWith('dairy');
+  const veganScouts=scoutsWith('vegan');
+
+  if(vegScouts.length && meal.vegName){
+    notes.push(`<span style="font-size:12px;color:var(--ts)"><i class="ti ti-arrows-exchange" style="font-size:11px;vertical-align:-1px;margin-right:3px"></i><strong>${namesOf(vegScouts)}:</strong> ${meal.vegName}</span>`);
+  }
+  if(gfScouts.length && meal.gfSwap && !meal.gfOk){
+    notes.push(`<span style="font-size:12px;color:var(--ts)"><i class="ti ti-arrows-exchange" style="font-size:11px;vertical-align:-1px;margin-right:3px"></i><strong>${namesOf(gfScouts)} (GF):</strong> ${meal.gfSwap}</span>`);
+  }
+  if(soyScouts.length && meal.soySwap){
+    notes.push(`<span style="font-size:12px;color:var(--ts)"><i class="ti ti-arrows-exchange" style="font-size:11px;vertical-align:-1px;margin-right:3px"></i><strong>${namesOf(soyScouts)} (soy-free):</strong> ${meal.soySwap}</span>`);
+  }
+  if(meal.spiceNote && pref.sp!=='mild'){
+    notes.push(`<span style="font-size:12px;color:var(--ts)"><i class="ti ti-flame" style="font-size:11px;vertical-align:-1px;margin-right:3px"></i>Add ${pref.sp==='bold'?'generous':'a pinch of'} chilli flakes and extra spice to taste</span>`);
+  }
+  if(meal.veganSwap && veganScouts.length && !meal.veganOk){
+    notes.push(`<span style="font-size:12px;color:var(--ts)"><i class="ti ti-arrows-exchange" style="font-size:11px;vertical-align:-1px;margin-right:3px"></i><strong>${namesOf(veganScouts)} (vegan):</strong> ${meal.veganSwap}</span>`);
+  }
+  if(meal.eggSwap && scoutsWith('egg').length){
+    notes.push(`<span style="font-size:12px;color:var(--ts)"><i class="ti ti-arrows-exchange" style="font-size:11px;vertical-align:-1px;margin-right:3px"></i><strong>${namesOf(scoutsWith('egg'))} (egg-free):</strong> ${meal.eggSwap}</span>`);
+  }
+  return notes.length ? `<div style="margin-top:4px;display:flex;flex-direction:column;gap:3px">${notes.join('')}</div>` : '';
+}
+
+// ─── Generate ─────────────────────────────────────────────────────────────────
+function generate(){
+  document.querySelectorAll('.sr-row input').forEach((inp,i)=>{ if(scouts[i]) scouts[i].name=inp.value; });
+  document.querySelectorAll('.sr-row .sz-sel').forEach((sel,i)=>{ if(scouts[i]) scouts[i].size=sel.value; });
+  if(!scouts.length){ alert('Please add at least one scout.'); return; }
+  const days=Math.max(2,parseInt(document.getElementById('days').value)||3);
+  const terrain=document.getElementById('terrain').value;
+  const plan=[];
+  for(let d=0;d<days;d++){
+    const arr=d===0, dep=d===days-1, full=!arr&&!dep;
+    plan.push({ day:d+1, arr, dep, full, d });
+  }
+  activePlan={ plan, days, terrain };
+  renderAll();
+  go('meals');
+}
+
+function toggleDepLunch(){ depLunch=!depLunch; renderAll(); }
+
+function swapMeal(d, slot){
+  const key=`${d}_${slot}`;
+  slots[key]=(slots[key]===undefined?d:slots[key])+1;
+  renderAll();
+}
+
+function renderAll(){
+  if(!activePlan) return;
+  renderMeals(activePlan);
+  renderLogistics(activePlan);
+  renderShopping(activePlan);
+}
+
+// ─── Render Meals ──────────────────────────────────────────────────────────────
+function renderMeals({plan,days,terrain}){
+  const n=scouts.length;
+  const avgKcal=Math.round(scouts.reduce((s,sc)=>s+SZ[sc.size].kcal,0)/n);
+  const boost=terrain==='Steep mountain'?'+15%':terrain==='Mixed bush'?'+10%':'';
+
+  const allAl=[...new Set(scouts.flatMap(s=>[...s.al]))];
+  const hasAny=allAl.length>0;
+
+  let h=`<div class="str">
+    <div class="st"><div class="sv">👥 ${n}</div><div class="sl2">Scouts</div></div>
+    <div class="st"><div class="sv">📅 ${days}</div><div class="sl2">Days</div></div>
+    <div class="st"><div class="sv">⚡ ${avgKcal.toLocaleString()}</div><div class="sl2">Avg kcal/day${boost?'*':''}</div></div>
+  </div>`;
+
+  if(boost) h+=`<div class="ib a" style="margin-bottom:.75rem"><i class="ti ti-flame"></i><span>*${boost} added for ${terrain.toLowerCase()}. Active hiking significantly raises calorie needs for growing teens (Australian NHMRC guidelines).</span></div>`;
+
+  if(hasAny){
+    const scoutAlSummary=scouts.filter(s=>s.al.size>0).map(s=>`${s.name||'Unnamed'}: ${[...s.al].join(', ')}`).join(' | ');
+    h+=`<div class="ib d"><i class="ti ti-shield-check"></i><span>Per-scout dietary needs tracked. Each meal shows individual swaps where needed. Always verify product labels on the day. — ${scoutAlSummary}</span></div>`;
+  }
+
+  h+=`<div class="ib s"><i class="ti ti-info-circle"></i><span>All meals are shelf-stable — no refrigeration needed. Targets based on Australian dietary guidelines for active teens 11–14 yrs. Tap <i class="ti ti-refresh" style="font-size:12px;vertical-align:-1px"></i> on any meal to try a different option.</span></div>`;
+
+  for(const dp of plan){
+    const bfData   = (dp.full||dp.dep) ? getMeal('bf',dp.d) : null;
+    const mtData   = (dp.full||dp.dep) ? getSnack(dp.d,'mt') : null;
+    const luData   = (dp.full||(dp.dep&&depLunch)) ? getMeal('lu',dp.d) : null;
+    const atData   = (dp.full||dp.arr) ? getSnack(dp.d,'at') : null;
+    const dinData  = (dp.full||dp.arr) ? getMeal('din',dp.d) : null;
+
+    const meals=[
+      bfData  && { type:'🌅 Breakfast',   ...bfData.meal,  slot:'bf',  d:dp.d },
+      mtData  && { type:'🍎 Morning tea', ...mtData.meal,  slot:'mt',  d:dp.d, noSwap:true },
+      luData  && { type:'🥪 Lunch',       ...luData.meal,  slot:'lu',  d:dp.d },
+      atData  && { type:'🌿 Arvo snack',  ...atData.meal,  slot:'at',  d:dp.d, noSwap:true },
+      dinData && { type:'🍲 Dinner',      ...dinData.meal, slot:'din', d:dp.d },
+    ].filter(Boolean);
+
+    const totKcal=meals.reduce((s,m)=>s+(m.kcal||0),0);
+    const pro=Math.round(totKcal*.18/4);
+    const carb=Math.round(totKcal*.52/4);
+    const fat=Math.round(totKcal*.30/9);
+
+    h+=`<div class="dc"><div class="dh">
+      <span class="dt">${dp.arr?'🏕️':dp.dep?'🥾':'⛺'} Day ${dp.day}${dp.arr?' — Arrival':dp.dep?' — Departure':''}</span>
+      <span class="kb">${totKcal.toLocaleString()} kcal</span>
+    </div>`;
+
+    if(dp.arr){
+      h+=`<div class="dn arr"><i class="ti ti-home"></i><div><strong>Scouts eat at home before arriving.</strong> Each scout brings their own breakfast, morning tea and lunch today. Patrol provides afternoon tea and dinner on arrival at camp.</div></div>`;
+    } else if(dp.dep){
+      h+=`<div class="dn dep" style="flex-wrap:wrap;gap:8px"><div style="display:flex;gap:8px;align-items:flex-start;flex:1"><i class="ti ti-walk"></i><div><strong>Scouts head home after morning tea.</strong> Patrol provides breakfast and morning tea only. Scouts will be home for lunch — no patrol catering needed from midday.</div></div><button onclick="toggleDepLunch()" style="flex-shrink:0;padding:5px 12px;border-radius:var(--r);border:.5px solid var(--bw);background:${depLunch?'var(--bgw)':'transparent'};color:var(--tw);font-family:var(--f);font-size:12px;cursor:pointer;white-space:nowrap"><i class="ti ti-${depLunch?'circle-check':'circle-plus'}" style="font-size:13px;vertical-align:-2px;margin-right:4px"></i>${depLunch?'Lunch added':'Add lunch'}</button></div>`;
+    }
+
+    for(const m of meals){
+      const notes=mealNotes(m, m.slot);
+      h+=`<div class="mr">
+        <span class="mt">${m.type}</span>
+        <div>
+          <div class="mn">${m.name}</div>
+          ${notes}
+        </div>
+        <span class="mk">${m.kcal} kcal</span>
+        ${m.noSwap?'<span></span>':`<button class="swap-btn" onclick="swapMeal(${m.d},'${m.slot}')" title="Try a different meal" aria-label="Swap meal"><i class="ti ti-refresh"></i></button>`}
+      </div>`;
+    }
+
+    if(dp.full){
+      h+=`<div class="mb">
+        <div class="mc pr"><div class="mv">${pro}g</div><div class="mlb">Protein</div></div>
+        <div class="mc cb"><div class="mv">${carb}g</div><div class="mlb">Carbs</div></div>
+        <div class="mc ft"><div class="mv">${fat}g</div><div class="mlb">Fat</div></div>
+      </div>`;
+    }
+    h+=`</div>`;
+  }
+
+  h+=`<div class="ib w"><i class="ti ti-leaf"></i><span><strong>Leave No Trace:</strong> Pack all rubbish out. Use resealable bags for food scraps. Never bury food waste. Camp kitchen at least 60m from water. Every piece of packaging comes home.</span></div>`;
+  document.getElementById('meals-out').innerHTML=h;
+}
+
+// ─── Render Logistics ──────────────────────────────────────────────────────────
+function renderLogistics({plan}){
+  const mw={bf:.12, mt:.08, lu:.15, at:.08, din:.20};
+  let foodKg=0;
+  for(const dp of plan){
+    if(dp.full||dp.dep) foodKg+=mw.bf+mw.mt;
+    if(dp.full) foodKg+=mw.lu+mw.at+mw.din;
+    if(dp.arr) foodKg+=mw.at+mw.din;
+  }
+  foodKg=Math.round(foodKg*10)/10;
+
+  const gear=[
+    {name:'Camp stove + igniter',kg:.5},
+    {name:'Cook pot 4 L',kg:.6},
+    {name:'Fuel canisters (×2)',kg:.6},
+    {name:'Water filter',kg:.4},
+    {name:'First aid kit',kg:.5},
+    {name:'Navigation kit',kg:.2},
+  ];
+
+  let h=`<div class="card"><p class="sl">🏋️ Food weight per scout</p>
+    <div class="str">
+      <div class="st"><div class="sv">🎒 ${foodKg} kg</div><div class="sl2">Food per scout</div></div>
+      <div class="st"><div class="sv">👥 ${scouts.length}</div><div class="sl2">Scouts</div></div>
+      <div class="st"><div class="sv">📦 ${Math.round(foodKg*scouts.length*10)/10} kg</div><div class="sl2">Total food</div></div>
+    </div>
+    <p class="sl" style="margin-top:.75rem">🗂️ Load distribution</p>`;
+
+  scouts.forEach((sc,i)=>{
+    const max=SZ[sc.size].maxKg;
+    const g=i<gear.length?gear[i]:null;
+    const gKg=g?g.kg:0;
+    const total=Math.round((foodKg+gKg)*10)/10;
+    const over=total>max;
+    const scAl=[...sc.al];
+    h+=`<div class="hr">
+      <div>
+        <div class="hn">${sc.name||'Scout '+(i+1)} <span style="font-size:11px;color:var(--tm)">(${SZ[sc.size].label})</span></div>
+        <div class="hsub">
+          ${g?`<span class="gt"><i class="ti ti-tool" style="font-size:10px"></i>${g.name}</span>`:''}
+          ${scAl.length?scAl.map(a=>`<span class="at">${a}</span>`).join(''):''}
+          Food ${foodKg} kg${gKg>0?` + gear ${gKg} kg`:''}
+        </div>
+      </div>
+      <div class="pd">
+        <div class="pw" style="color:${over?'var(--td)':'var(--tp)'}">${total} kg</div>
+        <div class="pl">max ${max} kg ${over?'⚠ over':'✓ ok'}</div>
+      </div>
+    </div>`;
+  });
+
+  h+=`</div><div class="ib w"><i class="ti ti-alert-triangle"></i><span>Fuel canisters are provided by the scout group — not included in shopping. Add sleeping kit (~1.5 kg), personal clothing (~1 kg) and water (~1.5 kg) to get each scout's full pack. Redistribute gear if anyone is over their limit.</span></div>`;
+  document.getElementById('log-out').innerHTML=h;
+}
+
+// ─── Render Shopping ──────────────────────────────────────────────────────────
+function renderShopping({plan,days}){
+  const n=scouts.length;
+  let nBf=0,nLu=0,nDin=0,nSn=0;
+  for(const dp of plan){
+    if(dp.full||dp.dep){ nBf++; nSn++; }
+    if(dp.full||(dp.dep&&depLunch)){ nLu++; nSn++; }
+    if(dp.full||dp.arr){ nDin++; nSn++; }
+  }
+
+  const noNuts=anyWith('nuts')||anyWith('peanuts');
+  const noGluten=anyWith('gluten');
+  const noDairy=anyWith('dairy');
+  const nVeg=scouts.filter(s=>s.al.has('veg')||s.al.has('vegan')).length;
+  const nMeat=n-nVeg;
+
+  const C={};
+  function add(cat,name,ref,qty,unit,price){
+    if(qty<=0) return;
+    if(!C[cat]) C[cat]=[];
+    C[cat].push([name,ref,qty,unit,price]);
+  }
+
+  if(nBf>0){
+    if(noGluten){
+      add('Breakfast','Red Tractor Organic Instant Oats 1kg','Coles ~$5.00/kg',Math.ceil(n*nBf*.09),'kg',5.00);
+    } else {
+      add('Breakfast','Coles Quick Oats 900g','Coles $1.95/900g',Math.ceil(n*nBf*.09/.9),'bag',1.95);
+    }
+    add('Breakfast','Honey squeeze bottle 500g','Coles est. ~$7.00',Math.ceil(n*nBf*.02/.5),'bottle',7.00);
+    add('Breakfast','Dried mango 200g pack','Coles est. ~$4.50',Math.ceil(n*nBf*.03/.2),'pack',4.50);
+    add('Breakfast','Coconut milk tetra pak 200ml (shelf-stable)','Coles est. ~$1.80',Math.ceil(n*nBf/3),'pack',1.80);
+    add('Breakfast','Coconut flakes 200g','Coles est. ~$3.50',Math.ceil(n/8),'bag',3.50);
+    if(pref.bf==='sweet') add('Breakfast','Coles Golden Syrup 500g','Coles est. ~$3.50',Math.ceil(n/12),'bottle',3.50);
+    if(pref.bf==='sav') add('Breakfast','Instant couscous 500g','Coles est. ~$3.00',Math.ceil(n*nBf*.07/.5),'pack',3.00);
+  }
+
+  if(nLu>0){
+    if(!noGluten) add('Lunch','Mission Wraps 8-pack','Coles est. ~$4.00/pack',Math.ceil(n*nLu*2/8),'pack',4.00);
+    else add('Lunch','Real Foods Corn Thins 150g','Coles est. ~$3.80',Math.ceil(n*nLu/3),'pack',3.80);
+    if(nMeat>0) add('Lunch','Sirena Tuna in Olive Oil 95g sachet','Coles est. ~$2.20',nMeat*nLu,'sachet',2.20);
+    if(nVeg>0) add('Lunch','Dried chickpeas 500g bag','Coles est. ~$2.00',Math.ceil(nVeg*nLu/6),'bag',2.00);
+    add('Lunch','Coles Tahini 300g jar','Coles est. ~$4.50',Math.ceil(n/8),'jar',4.50);
+    add('Lunch','Coles Sun-dried Tomatoes 100g','Coles est. ~$2.50',Math.ceil(n*nLu/6),'pack',2.50);
+    if(!noGluten) add('Lunch','Pita bread 6-pack (frozen/shelf)','Coles est. ~$3.50',Math.ceil(n*nLu/5),'pack',3.50);
+  }
+
+  if(nDin>0){
+    if(nMeat>0) add('Dinner','Sirena Salmon in Olive Oil 95g sachets','Coles est. ~$2.20 each',nMeat*nDin,'sachet',2.20);
+    if(nMeat>0) add('Dinner','Sirena Tuna in Olive Oil 95g sachets','Coles est. ~$2.20 each',Math.ceil(nMeat*nDin/2),'sachet',2.20);
+    add('Dinner','Red lentils 500g bag','Coles est. ~$2.20',Math.ceil(n*nDin*.08/.5),'bag',2.20);
+    add('Dinner','Dried chickpeas 500g bag','Coles est. ~$2.00',Math.ceil(n*nDin/6),'bag',2.00);
+    add('Dinner','Coles Passata carton 500ml','Coles est. ~$1.50',Math.ceil(n*nDin/3),'carton',1.50);
+    add('Dinner','Freeze-dried sweetcorn sachet 50g','Coles est. ~$3.50',Math.ceil(n*nDin/4),'sachet',3.50);
+    add('Dinner','Dried cannellini beans 500g bag','Coles est. ~$2.00',Math.ceil(n*nDin/6),'bag',2.00);
+    if(!noGluten) add('Dinner','Coles Pasta Penne 500g','Coles est. ~$1.25',Math.ceil(n*nDin*.09/.5),'pack',1.25);
+    add('Dinner','Coles Basmati Rice 2kg','Coles est. ~$4.50',Math.ceil(n*nDin*.09/2),'bag',4.50);
+    if(anyWith('gluten')) add('Dinner','GF pasta 500g','Coles est. ~$3.50',Math.ceil(anyWith('gluten')?scouts.filter(s=>s.al.has('gluten')).length*nDin*.09/.5:0),'pack',3.50);
+  }
+
+  if(nSn>0){
+    if(noNuts){
+      add('Snacks','Coles Seed Mix 165g','Coles $3.10/165g',Math.ceil(n*nSn/4),'bag',3.10);
+    } else {
+      add('Snacks','Coles Fruit and Nut Trail Mix 400g','Coles $7.00/400g',Math.ceil(n*nSn/6),'bag',7.00);
+    }
+    add('Snacks','Coles Muesli Bars 6-pack','Coles est. ~$3.50/6pk',Math.ceil(n*nSn/6),'pack',3.50);
+    add('Snacks','Coles Fruit Leather multipack','Coles est. ~$4.00',Math.ceil(n/4),'pack',4.00);
+    add('Snacks','Cadbury Dark Chocolate 180g block','Coles est. ~$4.00',Math.ceil(n/5),'block',4.00);
+    add('Snacks','Dried apricots 200g pack','Coles est. ~$3.50',Math.ceil(n*nSn/8),'pack',3.50);
+    if(!noNuts) add('Snacks','Coles Mixed Nuts 375g (unsalted)','Coles $5.50/375g',Math.ceil(n*nSn/8),'bag',5.50);
+  }
+
+  add('Pantry','Cobram Estate Olive Oil 375ml','Coles est. ~$7.00',Math.ceil(n/8),'bottle',7.00);
+  if(!anyWith('soy')) add('Pantry','Soy sauce 250ml bottle','Coles est. ~$2.50',Math.ceil(n/10),'bottle',2.50);
+  else add('Pantry','Coconut aminos 250ml (soy-free)','Coles est. ~$5.00',Math.ceil(n/10),'bottle',5.00);
+  add('Pantry','Sesame oil 100ml bottle','Coles est. ~$2.50',Math.ceil(n/10),'bottle',2.50);
+  add('Pantry','Curry powder 50g jar','Coles est. ~$2.00',Math.ceil(n/10),'jar',2.00);
+  add('Pantry','Salt and pepper grinder set','Coles est. ~$3.50',1,'set',3.50);
+  add('Pantry','Mixed herbs and spice sachets','Coles est. ~$2.00',Math.ceil(n/6),'sachet',2.00);
+  if(pref.sp!=='mild') add('Pantry','Chilli flakes 30g jar','Coles est. ~$2.00',1,'jar',2.00);
+  add('Pantry','Honey 500g squeeze bottle','Coles est. ~$7.00',Math.ceil(n/12),'bottle',7.00);
+
+  add('Consumables','Glad Resealable Bags small 25pk','Coles est. ~$3.00',Math.ceil(n/4),'pack',3.00);
+  add('Consumables','Glad Resealable Bags medium 25pk','Coles est. ~$4.00',Math.ceil(n/6),'pack',4.00);
+  add('Consumables','Heavy-duty bin bags for rubbish carry-out','Coles est. ~$5.00',1,'pack',5.00);
+
+  let grandTotal=0;
+  let h=`<h2 class="ptitle">Scout Hiking/Camping Planner — Shopping List<br><span style="font-size:13px;font-weight:400">${n} scouts | ${days} days | ${new Date().toLocaleDateString('en-AU')}</span></h2>`;
+  h+=`<div class="ib a"><i class="ti ti-shopping-cart"></i><span>All items from <strong>Coles</strong> (coles.com.au). Prices as at June 2026 — check current specials in-store. Fuel canisters supplied by the scout group (not listed here).</span></div>`;
+
+  const catEmoji={'Breakfast':'🌅','Lunch':'🥪','Dinner':'🍲','Snacks':'🍎','Pantry':'🧂','Consumables':'♻️'};
+  for(const [cat,items] of Object.entries(C)){
+    if(!items||!items.length) continue;
+    const em=catEmoji[cat]||'📦';
+    h+=`<div class="card"><div class="cat-title">${em} ${cat}</div>`;
+    for(const [name,ref,qty,unit,price] of items){
+      const line=Math.round(qty*price*100)/100;
+      grandTotal+=line;
+      h+=`<div class="shr">
+        <div><div class="si">${name}</div><div class="sisub">${ref}</div></div>
+        <span class="sq">× ${qty} ${unit}</span>
+        <span class="sp">$${line.toFixed(2)}</span>
+      </div>`;
+    }
+    h+=`</div>`;
+  }
+
+  const cpp=Math.round(grandTotal/n*100)/100;
+  h+=`<div class="tot-card">
+    <div class="tot-row"><span>Total (estimated)</span><span>$${grandTotal.toFixed(2)}</span></div>
+    <div class="cpp">Per scout: <strong>$${cpp.toFixed(2)}</strong> — Coles-based pricing (AUD, June 2026). Check specials to reduce costs.</div>
+  </div>`;
+  h+=`<button class="prt-btn" onclick="window.print()"><i class="ti ti-printer" aria-hidden="true"></i> Print / save as PDF</button>`;
+  h+=`<div class="ib w" style="margin-top:.75rem"><i class="ti ti-recycle"></i><span>Remove all excess packaging before the hike. Repack food into labelled zip-lock bags. All packaging comes home — no exceptions. Leave No Trace.</span></div>`;
+
+  document.getElementById('shop-out').innerHTML=h;
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+[['Alex','M'],['Sam','M'],['Jordan','L'],['Casey','S']].forEach(([n,s])=>addScout(n,s));
+</script>
+</body>
+</html>
